@@ -3,7 +3,7 @@ from gc import collect
 from pyspark.sql import SparkSession, Window
 from pyspark.sql.functions import monotonically_increasing_id, approx_count_distinct, first, last, mean, skewness, min, \
     max, stddev, stddev_samp, stddev_pop, variance, var_samp, var_pop, sum, sum_distinct, count, \
-    count_distinct, avg, expr, round, to_date, weekofyear, col
+    count_distinct, avg, expr, round, to_date, weekofyear, col, dense_rank
 
 
 def spark_aggregate_functions_example():
@@ -228,4 +228,13 @@ def analyse_invoices_rolling_sum_of_weeks_using_window_aggregation():
 
     summary_df.withColumn("running_total", sum("invoice_value") \
                           .over(running_total_window_last_1)) \
+        .show()
+
+    rank_window = Window.partitionBy("country") \
+        .orderBy(col("invoice_value").desc()) \
+        .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+
+    summary_df.withColumn("Rank", dense_rank().over(rank_window)) \
+        .where(col("Rank") == 1) \
+        .sort("Country", "WeekNumber") \
         .show()

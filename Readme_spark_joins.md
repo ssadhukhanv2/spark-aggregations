@@ -62,58 +62,39 @@
 
 ### [Spark Transformations Concepts](Readme_spark_data_transformation.md)
 
+### [Spark Data Aggregations](Readme_spark_aggregations.md)
+
+## Spark Joins
+* [Inner Joins](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/20930430#questions)
+  * Concept and Scenarios to use inner join
+  * Dealing with Column Name Ambiguity while applying inner join 
+  * Code available [here](https://github.com/LearningJournal/Spark-Programming-In-Python/blob/master/17-SparkJoinDemo/SparkJoinDemo.py)
+
+* [Outer Joins](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/20949086#questions)
+  * Concept of Outer Join
+  * Scenarios where we need to use outer joins(full outer, left outer, right outer)
+  * syntax of applying outer joins(full outer, left outer, right outer) in spark
+  * supplying a default value from other columns for null values
+  * Code available [here](https://github.com/LearningJournal/Spark-Programming-In-Python/blob/master/18-OuterJoinDemo/OuterJoinDemo.py)
+
+* [Shuffle Join](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/20968646#questions)
+  * Internal working of shuffle join
+  * How shuffling actuall happens
+  * Observe inner join performance inside the Spark UI
+  * Code available [here](https://github.com/LearningJournal/Spark-Programming-In-Python/blob/master/19-ShuffleJoinDemo/SuffleJoinDemo.py)
+
+* [Broadcast Join](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/21019950#questions)
+  * Large vs small datasets
+  * Some options we can use to fine tune the performance of join
+  * Why Shuffle joins are good for large to large datasets
+  * How Broadcast joins are a much better option for joins between a large dataset and a small sets
+  * Observe shuffle join performance within spark ui
+  * Code copy from video(Not available in git)
+
+* [Bucket Join](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/21052336#reviews)
+  * How to preprocess dataframes by partitioning/bucketing them in advance, need of time shuffling is eliminated
+  * Turn off Shuffle operation for joins so that all joins would become merge join.
+  * Code available [here](https://github.com/LearningJournal/Spark-Programming-In-Python/blob/master/20-BucketJoinDemo/BucketJoinDemo.py)
+
 ## Resources
 * [**sort() vs orderBy()**](https://towardsdatascience.com/sort-vs-orderby-in-spark-8a912475390)
-
-## Spark Data Aggregations
-
-* [**Different Spark Aggregate Functions**](https://sparkbyexamples.com/spark/spark-sql-aggregate-functions/) Some commonly used built-in Spark Aggregation Functions avaiable within `pyspark.sql.functions` are `monotonically_increasing_id, approx_count_distinct, first, last, mean, skewness, min, \
-    max, stddev, stddev_samp, stddev_pop, sumDistinct, variance, var_samp, var_pop,sum` . The Spark Aggregation functions in spark may be called two ways:
-  * Passing the Aggregation Functions in `DataFrame.agg()`
-    
-        employee_df.agg(approx_count_distinct("salary") \
-        .alias("Number of Distinct Salaries")).show()
-        
-        invoices_df.groupby("Country", "InvoiceNo") \
-        .agg(sum("Quantity").alias("Total Quantity"), \
-             round(sum(expr("Quantity*UnitPrice")), 2),
-             expr("round(sum(Quantity*UnitPrice),2) as InvoiceValueExpr")) \
-        .show()
-  * Passing the Aggregation Functions in `DataFrame.select()`
-    
-        employee_df.select(approx_count_distinct("salary")).show()
-  
-  * using df.selectExpr()
-        
-        invoices_df.selectExpr("count(1) as `count(1)`",
-                           "count(StockCode) as `count(StockCode)`",
-                           "sum(Quantity) as `Total Qty`",
-                           "avg(UnitPrice) as `Average Unit Price`",
-                           "approx_count_distinct(InvoiceNo) as `Number of Distinct Invoices`").show()
-  *  using spark sql: while using spark sql we need to create the view
-  
-         invoices_df.createOrReplaceTempView("sales")
-         
-         spark.sql("""
-         SELECT Country, InvoiceNo as InvoiceNo,
-         sum(Quantity) as Qty,
-         round(sum(Quantity*UnitPrice),2) as InvoiceValue
-         from sales
-         GROUP BY
-         Country,InvoiceNo
-         """) \
-         .show()
-
-* [**Data Aggregations with Spark**](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/20715134#questions) Spark Aggregations can be of 3 types:
-  * [**Simple Aggregations**](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/20715134#questions): see [utils.aggregator::spark_aggregate_functions_example()](lib/utils.py) and [utils.aggregator::analyse_invoices_using_simple_aggregation_functions()](lib/utils.py)
-  * [**Grouping Aggregations**](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/20717420#questions): see [utils.aggregator::group_invoices_by_country_and_weeknumber()](lib/utils.py)
-  * [**Windowing Aggregations**](https://www.udemy.com/course/apache-spark-programming-in-python-for-beginners/learn/lecture/20718896#questions): We can calculate the running total of teh invoices at a per week level for each country to see how the collection increased or decreased, in spark this may be acived using Windowing Aggregation Technique. This technique involves a three step process:
-    1. Identify your partitioning columns
-    2. Identify your ordering requirement
-    3. Define window start and end
-  
-       see `utils.aggregator::analyse_invoices_rolling_sum_of_weeks_using_window_aggregation()`[Code](lib/utils.py)
-   
-     All aggregations in spark are implemented as built-in functions. they are available within `pyspark.sql.functions` package
-      * **Built-in Aggregating Functions** These are used for simple and grouping aggregations. Example- `avg() count() max() min() sum()`
-      * **Built-in Window Functions** These are used for windowing aggregations. Example- `lead() lag() rank() dense_rank() cume_dist()`
